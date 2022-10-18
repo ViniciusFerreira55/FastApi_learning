@@ -2,8 +2,11 @@
 #install uvicorn[standard] and fastapi with pip
 #All credits to "Amigoscode" who make this code
 #https://www.youtube.com/c/amigoscode
-from uuid import uuid4, UUID
-from fastapi import FastAPI
+#to start the server we use the code uvicorn main:app --reload
+#if we add /docs in the url we go to a very cool page :) or there is a very cool extension for api is thunder client
+#both do the same thing but /docs bring more information
+from uuid import UUID
+from fastapi import FastAPI, HTTPException
 from typing import List
 from models import Gender, User, Role
 
@@ -36,3 +39,15 @@ async def fetch_users():
 @app.post("/api/v1/users")
 async def register_user(user: User):
     db.append(user)
+    return {"id" : user.id}
+
+@app.delete("/api/v1/users/{user_id}")
+async def delete_user(user_id: UUID):
+    for user in db:
+        if user.id == user_id:
+            db.remove(user)
+            return
+    raise HTTPException(
+        status_code=404,
+        detail=f'user with id: {user_id} does not exist'
+    )
